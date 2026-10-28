@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4f46e5">
+    <title>Siskiyou County Administration Building - Emergency Alerting</title>
+    
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        .btn-hold {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        .hold-progress { transition: width 0.04s linear; }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        .pulse-ring { animation: pulse-ring 2s infinite ease-in-out; }
+    </style>
+</head>
+<body class="bg-[#f0f3f6] text-slate-900 min-h-full flex flex-col justify-between items-center p-4 font-sans select-none antialiased">
+
+    <!-- Main Panic Button Area -->
+    <main class="w-full max-w-md my-auto flex flex-col items-center">
+        <div class="text-center mb-6 px-2">
+            <h1 class="text-2xl sm:text-[1.65rem] font-black text-slate-900 tracking-tight leading-snug">
+                Siskiyou County Administration Building
+            </h1>
+            <h2 class="text-lg sm:text-xl font-bold text-slate-800 mt-1">
+                Staff Alerting for Emergencies
+            </h2>
+        </div>
+
+        <div class="w-full bg-white rounded-2xl shadow-xl border border-slate-200/80 p-6 sm:p-7 space-y-4">
+            <p class="text-slate-600 text-sm font-medium text-left mb-2">
+                Hold a button for 1 second to send the alert.
+            </p>
+
+            <div class="space-y-3.5">
+                <button type="button" data-alert="weather" class="btn-hold relative w-full bg-[#27AE60] hover:bg-[#219652] active:scale-[0.99] text-white font-extrabold text-xl py-4 px-6 rounded-xl shadow-md overflow-hidden transition-all duration-150 flex items-center justify-center">
+                    <div class="hold-progress absolute left-0 top-0 bottom-0 bg-black/30 w-0 pointer-events-none"></div>
+                    <span class="relative z-10 tracking-wide">Weather/Environmental Hazard</span>
+                </button>
+
+                <button type="button" data-alert="fire" class="btn-hold relative w-full bg-[#C83727] hover:bg-[#b02e20] active:scale-[0.99] text-white font-extrabold text-xl py-4 px-6 rounded-xl shadow-md overflow-hidden transition-all duration-150 flex items-center justify-center">
+                    <div class="hold-progress absolute left-0 top-0 bottom-0 bg-black/30 w-0 pointer-events-none"></div>
+                    <span class="relative z-10 tracking-wide">Fire/Smoke</span>
+                </button>
+
+                <button type="button" data-alert="shooter" class="btn-hold relative w-full bg-[#B5BDC0] hover:bg-[#a1a9ac] active:scale-[0.99] text-slate-950 font-extrabold text-xl py-4 px-6 rounded-xl shadow-md overflow-hidden transition-all duration-150 flex items-center justify-center">
+                    <div class="hold-progress absolute left-0 top-0 bottom-0 bg-black/25 w-0 pointer-events-none"></div>
+                    <span class="relative z-10 tracking-wide">Combative Person - Shooter</span>
+                </button>
+
+                <button type="button" data-alert="bomb" class="btn-hold relative w-full bg-[#000000] hover:bg-[#1a1a1a] active:scale-[0.99] text-white font-extrabold text-xl py-4 px-6 rounded-xl shadow-md overflow-hidden transition-all duration-150 flex items-center justify-center">
+                    <div class="hold-progress absolute left-0 top-0 bottom-0 bg-white/35 w-0 pointer-events-none"></div>
+                    <span class="relative z-10 tracking-wide">Bomb Threat</span>
+                </button>
+
+                <button type="button" data-alert="hazmat" class="btn-hold relative w-full bg-[#E67E22] hover:bg-[#d36f18] active:scale-[0.99] text-white font-extrabold text-xl py-4 px-6 rounded-xl shadow-md overflow-hidden transition-all duration-150 flex items-center justify-center">
+                    <div class="hold-progress absolute left-0 top-0 bottom-0 bg-black/30 w-0 pointer-events-none"></div>
+                    <span class="relative z-10 tracking-wide">Hazardous Materials</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="mt-8 mb-2 text-center text-xs font-semibold text-slate-500 tracking-wide">
+        Cloudflare Powered PWA • Siskiyou OES
+    </footer>
+
+    <!-- Result Modal -->
+    <div id="successModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl space-y-4 border border-slate-100">
+            <div id="modalStatusIcon" class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto border border-red-200 pulse-ring">
+                <i data-lucide="radio" class="w-8 h-8"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-slate-900" id="sentAlertTitle">EMERGENCY ALERT DISPATCHED</h3>
+                <p class="text-xs font-medium text-slate-500 mt-1">Relayed via Cloudflare Worker Proxy to Rave</p>
+            </div>
+            
+            <div class="bg-slate-50 rounded-xl p-3.5 text-left border border-slate-200 text-xs font-mono space-y-1.5 text-slate-700">
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Ref Identifier:</span>
+                    <span class="font-bold text-slate-900" id="modalRefId">--</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Timestamp:</span>
+                    <span class="text-slate-800" id="modalTime">--</span>
+                </div>
+                <div class="flex justify-between items-center pt-1 border-t border-slate-200">
+                    <span class="text-slate-400">Rave HTTP Response:</span>
+                    <span class="font-bold text-emerald-600" id="modalHttpStatus">200 OK</span>
+                </div>
+            </div>
+
+            <button onclick="closeSuccessModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg">
+                Dismiss
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Service Worker Registration for PWA ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker Registered with scope:', reg.scope))
+                    .catch(err => console.error('Service Worker Registration Failed:', err));
+            });
+        }
+
+        const PRESETS = {
+            weather: { event: "Severe Weather", headline: "Weather Emergency", description: "A Severe Weather Emergency has been reported near County Administration Building. Move indoors, stay away from windows, and follow safety procedures. Exercise caution when going outdoors until the danger has passed.", urgency: "Immediate", severity: "Severe", certainty: "Observed" },
+            fire: { event: "Fire", headline: "Fire Emergency", description: "Fire or smoke has been reported inside or near the Siskiyou County Administration Building. Evacuate immediately.", urgency: "Immediate", severity: "Extreme", certainty: "Observed" },
+            shooter: { event: "Active Threat", headline: "Active Threat Emergency", description: "An active violent intruder has been reported on campus. Lock and barricade doors.", urgency: "Immediate", severity: "Extreme", certainty: "Observed" },
+            bomb: { event: "Bomb Threat", headline: "Bomb Threat Emergency", description: "A bomb threat has been initiated for the Siskiyou County Administration Facility.", urgency: "Immediate", severity: "Extreme", certainty: "Observed" },
+            hazmat: { event: "Hazardous Material", headline: "Hazmat Emergency", description: "A hazardous materials release has occurred at or near the Administration facility.", urgency: "Immediate", severity: "Severe", certainty: "Observed" }
+        };
+
+        let holdTimer = null, holdStartTime = 0, activeKey = null, activeBtn = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            document.querySelectorAll('.btn-hold').forEach(btn => {
+                const key = btn.getAttribute('data-alert');
+                btn.addEventListener('mousedown', (e) => startPress(e, btn, key));
+                btn.addEventListener('mouseup', () => cancelPress());
+                btn.addEventListener('mouseleave', () => cancelPress());
+                btn.addEventListener('touchstart', (e) => startPress(e, btn, key), { passive: false });
+                btn.addEventListener('touchend', () => cancelPress());
+            });
+        });
+
+        function startPress(e, btn, key) {
+            if (e.type === 'touchstart') e.preventDefault();
+            cancelPress();
+            activeBtn = btn;
+            activeKey = key;
+            holdStartTime = Date.now();
+            if (navigator.vibrate) navigator.vibrate(25);
+
+            function tick() {
+                if (!holdStartTime) return;
+                const elapsed = Date.now() - holdStartTime;
+                const pct = Math.min((elapsed / 1000) * 100, 100);
+                const bar = btn.querySelector('.hold-progress');
+                if (bar) bar.style.width = pct + '%';
+
+                if (elapsed >= 1000) {
+                    onHoldCompleted();
+                } else {
+                    holdTimer = requestAnimationFrame(tick);
+                }
+            }
+            holdTimer = requestAnimationFrame(tick);
+        }
+
+        function cancelPress() {
+            if (holdTimer) cancelAnimationFrame(holdTimer);
+            if (activeBtn) activeBtn.querySelector('.hold-progress').style.width = '0%';
+            holdTimer = null; holdStartTime = 0; activeBtn = null; activeKey = null;
+        }
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function buildXml(key) {
+            const p = PRESETS[key];
+            const now = new Date();
+            const exp = new Date(now.getTime() + 60 * 60000);
+            const formatIso = d => d.toISOString().replace(/\.\d{3}Z$/, '+00:00');
+            const id = generateUUID();
+
+            const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>${id}</identifier>
+  <sender>OES3@ReadySiskiyou.gov</sender>
+  <sent>${formatIso(now)}</sent>
+  <status>Actual</status>
+  <msgType>Alert</msgType>
+  <scope>Public</scope>
+  <info>
+    <category>Security</category>
+    <event>${p.event}</event>
+    <urgency>${p.urgency}</urgency>
+    <severity>${p.severity}</severity>
+    <certainty>${p.certainty}</certainty>
+    <eventCode>
+      <valueName>Building</valueName>
+      <value>admin</value>
+    </eventCode>
+    <effective>${formatIso(now)}</effective>
+    <expires>${formatIso(exp)}</expires>
+    <senderName>Automated Alert System</senderName>
+    <headline>${p.headline}</headline>
+    <description>${p.description}</description>
+    <area>
+      <areaDesc>1312 Fairlane Road, Yreka, CA 96097</areaDesc>
+    </area>
+  </info>
+</alert>`;
+            return { xml, id };
+        }
+
+        async function onHoldCompleted() {
+            const key = activeKey;
+            cancelPress();
+            if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
+
+            const { xml, id } = buildXml(key);
+
+            try {
+                // Post directly to Cloudflare Worker API endpoint
+                const res = await fetch('/api/alert', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/xml' },
+                    body: xml
+                });
+
+                const text = await res.text();
+                showModal(id, `${res.status} ${res.statusText}`, res.ok);
+            } catch (err) {
+                showModal(id, "Worker Connection Error", false);
+            }
+        }
+
+        function showModal(id, status, isOk) {
+            document.getElementById('modalRefId').textContent = id;
+            document.getElementById('modalTime').textContent = new Date().toLocaleTimeString();
+            document.getElementById('modalHttpStatus').textContent = status;
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+        function closeSuccessModal() { document.getElementById('successModal').classList.add('hidden'); }
+    </script>
+</body>
+</html>
