@@ -1,6 +1,6 @@
 {
-  "name": "Admin Alerts",
-  "short_name": "Alerts",
+  "name": "Admin Building Alerts",
+  "short_name": "Admin Bldg Alerts",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
