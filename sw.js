@@ -1,66 +1,37 @@
-// Service Worker (sw.js)
-const CACHE_NAME = 'app-cache-v1';
-
-// List of core static assets to pre-cache
-const PRECACHE_ASSETS = [
+const CACHE_NAME = 'cloudflare-pwa-v1';
+const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/main.js',
-  '/styles.css',
   '/manifest.json'
 ];
 
-// Install Event: Pre-cache static resources
+// Install: Cache core application resources
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('[Service Worker] Pre-caching offline assets');
-      return cache.addAll(PRECACHE_ASSETS);
-    }).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
   );
+  self.skipWaiting();
 });
 
-// Activate Event: Clean up outdated caches
+// Activate: Clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then((keys) => {
       return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            console.log('[Service Worker] Clearing old cache:', cache);
-            return caches.delete(cache);
-          }
-        })
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
       );
-    }).then(() => self.clients.claim())
+    })
   );
+  self.clients.claim();
 });
 
-// Fetch Event: Cache-First strategy with Network Fallback
+// Fetch: Serve cached content offline, or fetch from network
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
   if (event.request.method !== 'GET') return;
-
+  
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        // Cache newly fetched valid responses dynamically
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return networkResponse;
-      });
-    }).catch(() => {
-      // Optional: Return a fallback offline page if both cache and network fail
-      if (event.request.mode === 'navigate') {
-        return caches.match('/index.html');
-      }
+      return cachedResponse || fetch(event.request);
     })
   );
 });
